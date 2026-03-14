@@ -1,0 +1,175 @@
+/*
+ * Author: Christopher Forte
+ * Date: March 14, 2026
+ * Title: Doubly Linked List
+ * Description: Personal take on a bidirectionally linked linear structure enabling O(1) insertion and removal at both ends.
+ */
+
+class DoublyLinkedList {
+  #head;
+  #tail;
+  #length;
+
+  // Initializes an empty doubly linked list.
+  // Input:  none
+  // Output: void
+  constructor() {
+    this.#head = null;
+    this.#tail = null;
+    this.#length = 0;
+  }
+
+  // Stitches a new node between two existing adjacent nodes.
+  // Input:  before (node|null), after (node|null), value (*)
+  // Output: void
+  #insertBetween(before, after, value) {
+    const node = { data: value, prev: before, next: after };
+    if (before) before.next = node; else this.#head = node;
+    if (after) after.prev = node; else this.#tail = node;
+    this.#length++;
+  }
+
+  // Detaches a node from its neighbors and returns its value.
+  // Input:  node (object)
+  // Output: *
+  #unlink(node) {
+    if (node.prev) node.prev.next = node.next; else this.#head = node.next;
+    if (node.next) node.next.prev = node.prev; else this.#tail = node.prev;
+    this.#length--;
+    return node.data;
+  }
+
+  // Prepends a new value before the current head.
+  // Input:  value (*)
+  // Output: void
+  addFirst(value) { this.#insertBetween(null, this.#head, value); }
+
+  // Appends a new value after the current tail.
+  // Input:  value (*)
+  // Output: void
+  addLast(value) { this.#insertBetween(this.#tail, null, value); }
+
+  // Inserts a new value at the specified zero-based index.
+  // Input:  index (number), value (*)
+  // Output: void
+  addAt(index, value) {
+    if (index < 0 || index > this.#length) throw new RangeError("Index out of bounds");
+    if (index === 0) return this.addFirst(value);
+    if (index === this.#length) return this.addLast(value);
+    let curr = this.#head;
+    for (let i = 0; i < index; i++) curr = curr.next;
+    this.#insertBetween(curr.prev, curr, value);
+  }
+
+  // Removes and returns the first element.
+  // Input:  none
+  // Output: *
+  removeFirst() {
+    if (!this.#head) throw new RangeError("List is empty");
+    return this.#unlink(this.#head);
+  }
+
+  // Removes and returns the last element.
+  // Input:  none
+  // Output: *
+  removeLast() {
+    if (!this.#tail) throw new RangeError("List is empty");
+    return this.#unlink(this.#tail);
+  }
+
+  // Removes and returns the element at the specified index, traversing from the nearer end.
+  // Input:  index (number)
+  // Output: *
+  removeAt(index) {
+    if (index < 0 || index >= this.#length) throw new RangeError("Index out of bounds");
+    let curr;
+    if (index < this.#length / 2) {
+      curr = this.#head;
+      for (let i = 0; i < index; i++) curr = curr.next;
+    } else {
+      curr = this.#tail;
+      for (let i = this.#length - 1; i > index; i--) curr = curr.prev;
+    }
+    return this.#unlink(curr);
+  }
+
+  // Returns the element at the given index, traversing from the nearer end.
+  // Input:  index (number)
+  // Output: *
+  get(index) {
+    if (index < 0 || index >= this.#length) throw new RangeError("Index out of bounds");
+    let curr;
+    if (index < this.#length / 2) {
+      curr = this.#head;
+      for (let i = 0; i < index; i++) curr = curr.next;
+    } else {
+      curr = this.#tail;
+      for (let i = this.#length - 1; i > index; i--) curr = curr.prev;
+    }
+    return curr.data;
+  }
+
+  // Returns the head element without removing it.
+  // Input:  none
+  // Output: *
+  first() {
+    if (!this.#head) throw new RangeError("List is empty");
+    return this.#head.data;
+  }
+
+  // Returns the tail element without removing it.
+  // Input:  none
+  // Output: *
+  last() {
+    if (!this.#tail) throw new RangeError("List is empty");
+    return this.#tail.data;
+  }
+
+  // Returns true if the list contains the given value.
+  // Input:  value (*)
+  // Output: boolean
+  contains(value) {
+    let curr = this.#head;
+    while (curr) { if (curr.data === value) return true; curr = curr.next; }
+    return false;
+  }
+
+  // Reverses the list in place by swapping each node's prev and next references.
+  // Input:  none
+  // Output: void
+  reverse() {
+    let curr = this.#head;
+    [this.#head, this.#tail] = [this.#tail, this.#head];
+    while (curr) {
+      [curr.prev, curr.next] = [curr.next, curr.prev];
+      curr = curr.prev;
+    }
+  }
+
+  // Resets the list to empty by unlinking all nodes.
+  // Input:  none
+  // Output: void
+  clear() { this.#head = null; this.#tail = null; this.#length = 0; }
+
+  // Returns the number of elements in the list.
+  // Input:  none
+  // Output: number
+  size() { return this.#length; }
+
+  // Returns true if the list holds no elements.
+  // Input:  none
+  // Output: boolean
+  isEmpty() { return this.#length === 0; }
+
+  // Returns a bidirectional arrow-notation string of all elements.
+  // Input:  none
+  // Output: string
+  toString() {
+    const parts = [];
+    let curr = this.#head;
+    while (curr) { parts.push(curr.data); curr = curr.next; }
+    return "null <-> " + parts.join(" <-> ") + " <-> null";
+  }
+}
+
+module.exports = DoublyLinkedList;
