@@ -1,6 +1,7 @@
 # Linear Data Structures
 
 Author: Christopher Forte
+
 Date: March 14, 2026
 
 ## Overview
